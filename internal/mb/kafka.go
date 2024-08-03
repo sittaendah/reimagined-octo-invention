@@ -2,7 +2,6 @@ package mb
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"log"
 	"os"
