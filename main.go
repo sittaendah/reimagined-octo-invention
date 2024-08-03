@@ -2,13 +2,18 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	auth "github.com/sittaendah/aegis/internal/auth"
 	"github.com/sittaendah/aegis/internal/config"
+	"github.com/sittaendah/aegis/internal/mb"
 	org "github.com/sittaendah/aegis/internal/organization"
 	user "github.com/sittaendah/aegis/internal/user"
 )
 
 func main() {
 	config.ConnectDB()
+
+	mb.SetupKafkaProducer()
+	defer mb.Producer.Close()
 	r := gin.Default()
 
 	userRepo := &user.UserRepository{DB: config.DB}
@@ -16,8 +21,12 @@ func main() {
 	userController := &user.UserController{Service: userService}
 
 	orgRepo := &org.OrganizationRepository{DB: config.DB}
-	orgService := &org.OrganizationService{Repo: orgRepo}
+	orgService := &org.OrganizationService{Repo: orgRepo, UserRepo: userRepo}
 	orgController := &org.OrganizationController{Service: orgService}
+
+	authController := &auth.AuthController{UserService: userService}
+
+	r.POST("/login", authController.Login)
 
 	r.POST("/users", userController.CreateUser)
 	r.GET("/users", userController.GetAllUsers)

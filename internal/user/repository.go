@@ -34,6 +34,16 @@ func (r *UserRepository) GetUser(id int) (User, error) {
 	return user, nil
 }
 
+func (r *UserRepository) GetUserByUsername(username string) (User, error) {
+	var user User
+	row := r.DB.QueryRow(`SELECT id, username, password, role FROM users WHERE username = $1`, username)
+	err := row.Scan(&user.ID, &user.Username, &user.Password, &user.Role)
+	if err != nil {
+		return User{}, err
+	}
+	return user, nil
+}
+
 func (r *UserRepository) GetAllUsers() ([]User, error) {
 	rows, err := r.DB.Query(`SELECT id, username, role FROM users`)
 	if err != nil {

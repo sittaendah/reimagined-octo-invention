@@ -16,6 +16,10 @@ func (s *UserService) GetUser(id int) (User, error) {
 	return s.Repo.GetUser(id)
 }
 
+func (s *UserService) GetUserByUsername(username string) (User, error) {
+	return s.Repo.GetUserByUsername(username)
+}
+
 func (s *UserService) GetAllUsers() ([]User, error) {
 	return s.Repo.GetAllUsers()
 }
@@ -28,7 +32,7 @@ func (s *UserService) DeleteUser(id int) error {
 	return s.Repo.DeleteUser(id)
 }
 
-func CheckPassword(password, hash string) bool {
+func (s *UserService) CheckPassword(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
